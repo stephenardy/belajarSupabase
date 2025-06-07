@@ -52,7 +52,7 @@ const Home = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Link className="w-full" href={`/products/${menu.id}`}>
+              <Link className="w-full" href={`/menus/${menu.id}`}>
                 <Button className="w-full font-bold cursor-pointer" size="lg">
                   Detail Menu
                 </Button>
