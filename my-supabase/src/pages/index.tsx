@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const Home = () => {
   const [menus, setMenus] = useState<IMenu[]>([]);
@@ -51,9 +52,11 @@ const Home = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button className="w-full font-bold cursor-pointer" size="lg">
-                Detail Menu
-              </Button>
+              <Link className="w-full" href={`/products/${menu.id}`}>
+                <Button className="w-full font-bold cursor-pointer" size="lg">
+                  Detail Menu
+                </Button>
+              </Link>
             </CardFooter>
           </Card>
         ))}
