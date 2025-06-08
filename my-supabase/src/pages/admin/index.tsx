@@ -349,7 +349,7 @@ const AdminPage = () => {
                   name="price"
                   type="text"
                   placeholder="Input menu price"
-                  defaultValue={String(selectedMenu?.menu.price)}
+                  defaultValue={selectedMenu?.menu.price}
                   required
                 ></Input>
               </div>
