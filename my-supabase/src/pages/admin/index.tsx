@@ -47,7 +47,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-
 const AdminPage = () => {
   const [menus, setMenus] = useState<IMenu[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -104,6 +103,34 @@ const AdminPage = () => {
           prev.filter((menu) => menu.id !== selectedMenu?.menu.id)
         );
         toast("Delete menu success");
+        setSelectedMenu(null);
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+  const handleUpdateMenu = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    try {
+      const { error } = await supabase
+        .from("menus")
+        .update(Object.fromEntries(formData))
+        .eq("id", selectedMenu?.menu.id)
+        .select();
+      if (error) console.log("error", error);
+      else {
+        setMenus((prev) =>
+          prev.map((menu) =>
+            menu.id === selectedMenu?.menu.id
+              ? { ...menu, ...Object.fromEntries(formData) }
+              : menu
+          )
+        );
+        toast("Update menu success");
         setSelectedMenu(null);
       }
     } catch (error) {
@@ -232,7 +259,13 @@ const AdminPage = () => {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          setSelectedMenu({ menu, action: "edit" })
+                        }
+                      >
+                        Edit
+                      </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() =>
                           setSelectedMenu({ menu, action: "delete" })
@@ -249,6 +282,7 @@ const AdminPage = () => {
           ))}
         </TableBody>
       </Table>
+      {/* delete menu */}
       <Dialog
         open={selectedMenu !== null && selectedMenu.action === "delete"}
         onOpenChange={(open) => {
@@ -279,6 +313,98 @@ const AdminPage = () => {
               Delete
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* update menu */}
+      <Dialog
+        open={selectedMenu !== null && selectedMenu.action === "edit"}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedMenu(null);
+          }
+        }}
+      >
+        <DialogContent>
+          <form onSubmit={handleUpdateMenu}>
+            <DialogHeader>
+              <DialogTitle>Update New Menu</DialogTitle>
+              <DialogDescription>Input the new menu details</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4">
+              <div className="grid gap-3">
+                <Label htmlFor="name">Menu Name</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  placeholder="Input menu name"
+                  defaultValue={selectedMenu?.menu.name}
+                  required
+                ></Input>
+              </div>
+              <div className="grid gap-3">
+                <Label htmlFor="price">Price</Label>
+                <Input
+                  id="price"
+                  name="price"
+                  type="text"
+                  placeholder="Input menu price"
+                  defaultValue={String(selectedMenu?.menu.price)}
+                  required
+                ></Input>
+              </div>
+              <div className="grid gap-3">
+                <Label htmlFor="category">Category</Label>
+                <Select
+                  name="category"
+                  defaultValue={selectedMenu?.menu.category}
+                  required
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Categories</SelectLabel>
+                      <SelectItem value="beverages">Beverages</SelectItem>
+                      <SelectItem value="pastry">Pastry</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-3">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  className="resize-none"
+                  defaultValue={selectedMenu?.menu.description}
+                  required
+                ></Textarea>
+              </div>
+              <div className="grid gap-3">
+                <Label htmlFor="image">Image</Label>
+                <Input
+                  id="image"
+                  name="image"
+                  type="text"
+                  placeholder="Input Image URL"
+                  defaultValue={selectedMenu?.menu.image}
+                  required
+                ></Input>
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogClose>
+                <Button type="button" variant="secondary">
+                  Close
+                </Button>
+              </DialogClose>
+              <Button type="submit" variant="default">
+                Update
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>
